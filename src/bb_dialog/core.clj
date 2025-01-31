@@ -34,7 +34,7 @@
   [type title body & args]
   (if-let [diag *dialog-command*]
     (let [command (concat [diag "--clear" "--title" title type body 0 0] args)]
-      (apply shell {:continue true :err :string} command)0)
+      (apply shell {:continue true :err :string} command))
     (throw (Exception. "bb-dialog was unable to locate a working version of dialog! Please install it in the PATH."))))
 
 (defn message
