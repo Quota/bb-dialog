@@ -13,6 +13,25 @@
     (which "Xdialog") "Xdialog"
     :else nil))
 
+(def ^:dynamic *dialog-global-options*
+  "A var which may contain, as a seq of strings, global options to be passed
+  down to the dialog command.
+
+  Example:
+
+  ```
+  (require '[bb-dialog.core :as bd])
+
+  ; hide menu-item keys
+  (with-bindings {#'bd/*dialog-global-options* [\"--notags\"]}
+    (bd/menu \"Main menu\"
+	     \"Please choose:\"
+	     {:m-h \"Home\" :m-s \"Search\" :m-c \"Config\" :m-q \"Quit\"}))
+  ```
+
+  Default value: nil."
+  nil)
+
 (defn command
   "The base function wrapper for calling out to the system's version of `dialog`.
 
@@ -33,7 +52,7 @@
 
   [type title body & args]
   (if-let [diag *dialog-command*]
-    (let [command (concat [diag "--clear" "--title" title type body 0 0] args)]
+    (let [command (concat [diag "--clear"] *dialog-global-options* ["--title" title type body 0 0] args)]
       (apply shell {:continue true :err :string} command))
     (throw (Exception. "bb-dialog was unable to locate a working version of dialog! Please install it in the PATH."))))
 

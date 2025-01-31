@@ -1,6 +1,8 @@
 # Table of contents
 -  [`bb-dialog.core`](#bb-dialog.core) 
     -  [`*dialog-command*`](#bb-dialog.core/*dialog-command*) - A var which attempts to contain the correct version of <code>dialog</code> for the system.
+    -  [`*dialog-global-options*`](#bb-dialog.core/*dialog-global-options*) - A var which may contain, as a seq of strings, global options to be passed down to the dialog command.
+    -  [`calendar`](#bb-dialog.core/calendar) - Calls a <code>--calendar</code> dialog, and returns the selected date as a string.
     -  [`checklist`](#bb-dialog.core/checklist) - Calls a <code>--checklist</code> dialog, and returns the selected options as a seq of options.
     -  [`command`](#bb-dialog.core/command) - The base function wrapper for calling out to the system's version of <code>dialog</code>.
     -  [`confirm`](#bb-dialog.core/confirm) - Calls a confirmation dialog (<code>dialog --yesno</code>), and returns a boolean depending on whether the user agreed.
@@ -19,14 +21,53 @@
 
 
 
-## <a name="bb-dialog.core/*dialog-command*">`*dialog-command*`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L7-L15)
+## <a name="bb-dialog.core/*dialog-command*">`*dialog-command*`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L6-L14)
 <a name="bb-dialog.core/*dialog-command*"></a>
 
 A var which attempts to contain the correct version of `dialog` for the
    system. Given that this could potentially fail, and can't necessarily foresee
    all possibilities, the var is dynamic to allow rebinding by the end user.
 
-## <a name="bb-dialog.core/checklist">`checklist`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L125-L153)
+## <a name="bb-dialog.core/*dialog-global-options*">`*dialog-global-options*`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L16-L33)
+<a name="bb-dialog.core/*dialog-global-options*"></a>
+
+A var which may contain, as a seq of strings, global options to be passed
+  down to the dialog command.
+
+  Example:
+
+  ```
+  (require '[bb-dialog.core :as bd])
+
+  ; hide menu-item keys
+  (with-bindings {#'bd/*dialog-global-options* ["--notags"]}
+    (bd/menu "Main menu"
+	     "Please choose:"
+	     {:m-h "Home" :m-s "Search" :m-c "Config" :m-q "Quit"}))
+  ```
+
+  Default value: nil.
+
+## <a name="bb-dialog.core/calendar">`calendar`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L113-L127)
+<a name="bb-dialog.core/calendar"></a>
+``` clojure
+
+(calendar title body & [year month day])
+```
+
+
+Calls a `--calendar` dialog, and returns the selected date as a string.
+
+  Args:
+  - `title`: The title text of the dialog
+  - `body`: The body text of the dialog
+  - `year`: The starting year of the calendar [YYYY] (optional)
+  - `month`: The starting month of the calendar [MM] (optional)
+  - `day`: The starting day of the calendar     [dd] (optional)
+
+  Returns: string (dd/mm/yyyy), or nil if the user selected cancel
+
+## <a name="bb-dialog.core/checklist">`checklist`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L156-L184)
 <a name="bb-dialog.core/checklist"></a>
 ``` clojure
 
@@ -58,7 +99,7 @@ Calls a `--checklist` dialog, and returns the selected options as a seq of
    Returns: seq of keywords (or results of `out-fn`), or nil if the user selects
    cancel or selects no choices.
 
-## <a name="bb-dialog.core/command">`command`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L17-L42)
+## <a name="bb-dialog.core/command">`command`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L35-L57)
 <a name="bb-dialog.core/command"></a>
 ``` clojure
 
@@ -83,7 +124,7 @@ The base function wrapper for calling out to the system's version of `dialog`.
    Of useful note are the `:exit` and `:err` keys, which will contain the return
    values from the call to `dialog`.
 
-## <a name="bb-dialog.core/confirm">`confirm`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L58-L68)
+## <a name="bb-dialog.core/confirm">`confirm`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L73-L83)
 <a name="bb-dialog.core/confirm"></a>
 ``` clojure
 
@@ -100,7 +141,7 @@ Calls a confirmation dialog (`dialog --yesno`), and returns a boolean
 
    Returns: boolean
 
-## <a name="bb-dialog.core/input">`input`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L85-L96)
+## <a name="bb-dialog.core/input">`input`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L100-L111)
 <a name="bb-dialog.core/input"></a>
 ``` clojure
 
@@ -116,7 +157,7 @@ Calls an `--inputbox` dialog, and returns the user input as a string.
 
    Returns: string, or nil if the user selects cancel
 
-## <a name="bb-dialog.core/menu">`menu`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L98-L123)
+## <a name="bb-dialog.core/menu">`menu`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L129-L154)
 <a name="bb-dialog.core/menu"></a>
 ``` clojure
 
@@ -142,7 +183,7 @@ Calls a `--menu` dialog, and returns the selected option as a keyword.
 
    Returns: keyword (or result of `out-fn`), or nil if the user selects cancel.
 
-## <a name="bb-dialog.core/message">`message`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L44-L56)
+## <a name="bb-dialog.core/message">`message`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L59-L71)
 <a name="bb-dialog.core/message"></a>
 ``` clojure
 
@@ -161,7 +202,7 @@ Calls a message dialog (`dialog --msgbox`), which simply presents some text
 
    Returns: boolean
 
-## <a name="bb-dialog.core/pause">`pause`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L70-L83)
+## <a name="bb-dialog.core/pause">`pause`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L85-L98)
 <a name="bb-dialog.core/pause"></a>
 ``` clojure
 
@@ -181,7 +222,7 @@ Calls a confirmation dialog with a timeout (`dialog --pause`). Unless
 
    Returns: boolean
 
-## <a name="bb-dialog.core/radiolist">`radiolist`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L155-L183)
+## <a name="bb-dialog.core/radiolist">`radiolist`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L186-L214)
 <a name="bb-dialog.core/radiolist"></a>
 ``` clojure
 
@@ -211,7 +252,7 @@ Calls a `--radiolist` dialog, and returns the selected option as a keyword.
 
    Returns: keyword (or results of `out-fn`), or nil if the user selects cancel.
 
-## <a name="bb-dialog.core/treeview">`treeview`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L202-L258)
+## <a name="bb-dialog.core/treeview">`treeview`</a> [📃](https://github.com/pixelated-noise/bb-dialog/blob/main/src/bb_dialog/core.clj#L233-L289)
 <a name="bb-dialog.core/treeview"></a>
 ``` clojure
 
